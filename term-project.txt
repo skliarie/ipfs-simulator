@@ -24,3 +24,23 @@ While running, it will be possible to specify:
 Output of the simulator would have graphs of blocks traversal speed, pubsub speed, etc
 
 Obviously this should be written in go, to facilitate thousands of goroutines that represent hosts and networks.
+
+Execution Phase I
+~~~~~~~~~~~~~~~~~
+* Start N nodes, that are connected on average by C connections, with average bandwidth B.
+* Populate nodes with blocks of varying size.
+* Use simple routing algorithm that asks each connected node whether it has desired block
+* Start simulation with scenario that H nodes want to receive blocks with different popularity.
+* Print statistics with details:
+  - how much time taken
+  - how many blocks discovered, not discovered
+
+Execution Phase II
+~~~~~~~~~~~~~~~~~~
+Iterative improvements on the Phase I
+* improve on routing algorithm to use DHT
+* use different up/down bandwidth for nodes
+* add connection latency
+* ability for routing algorithm to disconnect wasteful connections and establish new, supposedly useful ones
+* nodes clustering support (when nodes have unlimited network between them)
+* blocks transfer prioritization
