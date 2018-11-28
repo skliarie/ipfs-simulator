@@ -1,0 +1,26 @@
+The IPFS simulator is going to be single process application that simulates IPFS network under different network conditions,
+simulates predefined data transfers and provides statistics on simulation.
+
+The goal is to enable quick iterations in routing algorithm development, before thousands of full-fledged
+IPFS daemons are spun (using https://github.com/ipfs/iptb).
+
+The simulator would have configuration to specify following "starting situation":
+
+* whether node is NATed
+* percentage of "unique" content, small and big blocks
+* speed of node's network up/down
+* connection latency
+* amount of storage available
+* amount of pubsub channels, number of subscribers
+* clustering with some other nodes
+
+While running, it will be possible to specify:
+
+* amount of interest in various blocks to go up and down
+* normal/important blocks (e.g. blocks requested from browser are much more important to
+  retrieve than backup of some blocks). Same goes for sending unique content.
+  (Currently IPFS does not support blocks prioritization, so it is more of theoretical part).
+
+Output of the simulator would have graphs of blocks traversal speed, pubsub speed, etc
+
+Obviously this should be written in go, to facilitate thousands of goroutines that represent hosts and networks.
