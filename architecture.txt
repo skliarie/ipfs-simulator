@@ -1,5 +1,6 @@
 Assumptions:
- * disk seek time is immediate, node CPU processing time is immediate 
+ * disk seek time is immediate, node CPU processing time is immediate
+ * data blocks have no content, we simulate time it takes to transfer the data
 
 Architecture
 ~~~~~~~~~~~~
@@ -16,10 +17,22 @@ World generation procedure:
 * Create requested number of objects of class node
 * Create random links between nodes, with random bandwidth and latency, specified in milliseconds
 * Populate nodes with random content, varying in number of blocks and sizes
-* Populate nodes with content demand (future: request urgency)
+* Populate nodes with wanted blocks (future: request urgency)
 
-2. The Simulation
+2. Routing class
 
-Simulation granularity is 1 millisecond. Sent data are registered in "transit" callback queue so that target node is woken up at given time in the future. "Transfer time" might be affected by link capacity (tracked by per node link_fill_up parameter) of both sides.
+Each node inherits same routing class developer wants to test. The class should access following data objects:
+* list of neigbour nodes
+* list of wanted blocks
+* arrived data blocks
 
-The simulation finishes when all demands are satisfied or no data transfer occurs.
+3. The Simulation
+
+Simulation granularity is 1 millisecond. Sent data are registered in global "transit" callback queue so that target node is woken up at given time in the future. "Transfer time" might be affected by link capacity (tracked by per node link_fill_up parameter) of both sides.
+
+The simulation finishes when all demands are satisfied or "transit" queue is empty.
+
+Open questions:
+ * what is best architecture for this? Start goroutine for each node? Use channels? Or several threads working on a huge array?
+ * The architecture should allow more than one node, how do we do that?
+ 
