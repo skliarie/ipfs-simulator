@@ -36,3 +36,4 @@ Open questions:
  * what is best architecture for this? Start goroutine for each node? Use channels? Or several threads working on a huge array?
  * The architecture should allow more than one node, how do we do that?
  
+I am considering to partition the network on CPU basis. E.g. create world, run thread per CPU, allocate nodes to threads evenly. Establish channels between threads for "transit" and "time" notifications. The approach would scale out across several machines nicely. Ideas?
