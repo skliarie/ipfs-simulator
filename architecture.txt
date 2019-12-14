@@ -54,7 +54,6 @@ Simulation granularity is 1 millisecond. Once all executors reported readiness, 
 Master uses simulation scenario file to issue "tasks" to executors. The scenario language allows operators like these:
 * Start A nodes of link type B as bootstrapping nodes
 * Seed A nodes of link type B with C GB of content that is of interest by D nodes
-* (Optional) Start streaming at rate A at node of link type B that is of interest by C nodes, for D seconds
 
 The "pseudo random" selection of nodes in scenario uses same random seed as during world creation, thus allowing replayability of world/scenarios and getting same results.
 
