@@ -1,6 +1,6 @@
 Tasks for execution:
 
-Master/starter framework
+Master/starter framework (simulator.go)
 
 Do each step completely before moving on to the next step.
 
@@ -14,3 +14,11 @@ Do each step completely before moving on to the next step.
 * master - add flag --cores X, that means number of CPU cores it must await
 * master - once expected number of cores received, send command create world abc from master to each starter
 * starter - receive commands from master and print on screen
+* starter - if connection to master got lost, reset state, try to connect to master every second
+* master - read initial parameters config file in yaml format, convert to json, pass to starters as part of "CREATE WORLD" command
+* starters - receive json, print on screen various fields.
+
+World creation (executor.go)
+
+* Receive initial world creation parameters, including executor ID and country/executor mapping
+* Create "my" world part
