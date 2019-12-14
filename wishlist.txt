@@ -1,3 +1,8 @@
 List of desired further improvements.
 
 * Implement back-throttling of transmissions. This means that if link of receiving node is full, the sending node will reduce sending speed accordingly. It might also notify testing node about data sending speed.
+* Have support for packets loss
+* Support for different priority content. For example stream is likely to have higher priority.
+* Support for two links nodes like typical phones might have (Expensive Cellular/Wifi). Researchers might want to look into ways to minimise cellular data plan.
+* NAT support - meaning that other nodes can not send data directly, but must use proxy node
+* auto-clustering: Nodes in the same LAN might detect they are in the same network and make different decisions as result
