@@ -7,3 +7,4 @@ List of desired further improvements.
 * NAT support - meaning that other nodes can not send data directly, but must use proxy node
 * auto-clustering: Nodes in the same LAN might detect they are in the same network and make different decisions as result
 * support different storage latencies (magnetic=4-11ms)
+* support streaming. One node would generate content at constant rate, that many nodes will be immediately interested in. Simulator scenario would accept command in form "Start streaming at rate A at node of link type B that is of interest by C nodes, for D seconds"
