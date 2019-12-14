@@ -1,0 +1,3 @@
+Tasks for execution:
+
+Create master/starter framework
