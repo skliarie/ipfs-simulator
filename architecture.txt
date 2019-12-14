@@ -1,39 +1,74 @@
-Assumptions:
- * disk seek time is immediate, node CPU processing time is immediate
- * data blocks have no content, we simulate time it takes to transfer the data
-
 Architecture
 ~~~~~~~~~~~~
 
 1. World creator
 
-Set of nodes, links and content is called "world". The world must be reproduceable, so that others might analyse problematic issues that happen in one world but not the others. Thus the world is created from 512 bit (64bytes) seed.
+The simulator operates on map of nodes, ISP and countries so they represent the internet, with special attention given to network speed and latency. The "world" must be reproduceable, so that others might analyse problematic issues that happen in one world but not the others. Thus the world is created from 512 bit (64bytes) seed of pseudo-random generator.
 
 The seed is used to create "random" set of bits that are used to decide various parameters of the world. For easier implementation and to save memory, all numbers in the world are represented as power of 2. Thus word "random" in this document is not truly random, but based on seeded set of bits.
 
-Initial parameters of world are: Number of nodes, number of connections of each nodes, size of content
+Initial parameters of world are:
+* Number of countries
+* number of ISPs
+* number of nodes
+* nodes speed dispersion (16 numbers), sum of the numbers must be 100 (meaning 100%).
+* number of executors
 
-World generation procedure:
-* Create requested number of objects of class node
-* Create random links between nodes, with random bandwidth and latency, specified in milliseconds
-* Populate nodes with random content, varying in number of blocks and sizes
-* Populate nodes with wanted blocks (future: request urgency)
+To simplify implementation, but preserve network links effects we seek, we implement the "world" in following way:
+* Each node receive 32bit digit as "IP" address
+* The "IP" is constructed using bit fields, where:
+  - first 8 bits is country number
+  - second 8 bits is ISP number
+  - next 4 bits specify node "link" type. The predefined link type describe link parameters for the node (up/down speed and latency). Up/Down speed is specified in bytes/second. Latency is specified in microseconds.
+  - rest 12 bits specify node number
+  
+The arrangement makes it very simply to calculate link max speed/latency between two IP numbers just by looking at two "IP" numbers.
+  
+The simulator is working by coordinating many computers using "master" and "starters" roles. Each computer (beside one that runs "master") runs the simulator in "starter" mode that performs the operations below:
+* Connect to "master" and provide number of CPUs available
+* receive list of other starters and executors
+* Connect to other starters
+* receive instructions on world creation
+* Spawn executor for each available CPU
+* Maintain "routing" of messages between executors, no tracking is done here
 
-2. Routing class
+Once all starters are connected to master, master advertises list of all executors and their tcp/ip details, assigns each executor its number, world initiation parameters and awaits completion answer.
 
-Each node inherits same routing class developer wants to test. The class should access following data objects:
-* list of neigbour nodes
-* list of wanted blocks
-* arrived data blocks
+Each executor "creates" nodes it is responsible for using Node API.
 
-3. The Simulation
+2. The Simulation
 
-Simulation granularity is 1 millisecond. Sent data are registered in global "transit" callback queue so that target node is woken up at given time in the future. "Transfer time" might be affected by link capacity (tracked by per node link_fill_up parameter) of both sides.
+Simulation granularity is 1 millisecond. Once all executors reported readiness, the simulation might start. Simulated milliseconds are called Epoch, starting from 0. Master acts as synchronization point, issuing command to start sumulation for given epoch and awaiting completion signals from each executor.
 
-The simulation finishes when all demands are satisfied or "transit" queue is empty.
+Master uses simulation scenario file to issue "tasks" to executors. The scenario language allows operators like these:
+* Start A nodes of link type B as bootstrapping nodes
+* Seed A nodes of link type B with C GB of content that is of interest by D nodes
+* (Optional) Start streaming at rate A at node of link type B that is of interest by C nodes, for D seconds
 
-Open questions:
- * what is best architecture for this? Start goroutine for each node? Use channels? Or several threads working on a huge array?
- * The architecture should allow more than one node, how do we do that?
- 
-I am considering to partition the network on CPU basis. E.g. create world, run thread per CPU, allocate nodes to threads evenly. Establish channels between threads for "transit" and "time" notifications. The approach would scale out across several machines nicely. Ideas?
+The "pseudo random" selection of nodes in scenario uses same random seed as during world creation, thus allowing replayability of world/scenarios and getting same results.
+
+3. Node API
+
+Nodes interact with tested code using library-like API:
+* Intialize
+* register with bootstrap nodes on given "IP" numbers.
+* Create A GB of content. Returns hash of the content.
+* Be interested in getting content A (content identifying hash).
+* Are there any unsatisfied interests? (returns yes or no)
+* Receive and process transmission from IP A: (data).
+* Wanna send transmission? (returns list of transmissions to send)
+
+Transmission is process of transferring data of specified length from one node to another. Transmission is delivered to target node once it is fully "sent" by sending node and fully "received" by target node. Sending and receival progress is tracked by sending and receiving executor respectively every epoch. Transmission is started by sending data in full and creating trasmission ID (TID). At each passing epoch, sending executor updates tracking data structure on progress of the transmission, while taking into account link capacity. It then sends the transmission progress report (TPR) of each transmission to target executor. For simplicity, back-throttling is not simulated at the time.
+
+Similarily, each executor receives transmission data and saves it aside. It then updates transmission progress data structure on each incoming TPR. Once final TPR is received, the transmission data are passed to the node.
+
+Executor handles tracking transmissions delivery timing. For each transmission, sending executor performs these actions:
+* Send transmission to target executor complete transmission data with unique ID.
+* At each epoch do below:
+  - For each transmission "in flight" update transmission progress counters, send TPR to the target node
+  - Once transmission is complete, it is deleted on the source node, final TPR is sent to the target node
+Receiving excutor performs these actions
+* Receive transmission, store data aside, create transmission progress data structure
+* At each epoch do below:
+  - For each incoming TPR, update transmission progress counters
+  - Once counters show that transmission have been delivered, pass the data to the node.
