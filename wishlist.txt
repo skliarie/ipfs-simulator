@@ -6,3 +6,4 @@ List of desired further improvements.
 * Support for two links nodes like typical phones might have (Expensive Cellular/Wifi). Researchers might want to look into ways to minimise cellular data plan.
 * NAT support - meaning that other nodes can not send data directly, but must use proxy node
 * auto-clustering: Nodes in the same LAN might detect they are in the same network and make different decisions as result
+* support different storage latencies (magnetic=4-11ms)
