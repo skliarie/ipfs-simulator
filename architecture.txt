@@ -19,10 +19,21 @@ To simplify implementation, but preserve network links effects we seek, we imple
 * The "IP" is constructed using bit fields, where:
   - first 8 bits is country number
   - second 8 bits is ISP number
-  - next 4 bits specify node "link" type. The predefined link type describe link parameters for the node (up/down speed and latency). Up/Down speed is specified in bytes/second. Latency is specified in microseconds.
+  - next 4 bits specify node "link" type (see below)
   - rest 12 bits specify node number
   
-The arrangement makes it very simply to calculate link max speed/latency between two IP numbers just by looking at two "IP" numbers.
+Link types define link parameters for the node: up/down speed and latency. Up/Down speed is specified in bytes/second. Latency is specified in microseconds. Here is preliminary list of link types (Down speed/Up speed, latency):
+* 0 - 56k dial up: 7KB/4.5KB,140ms
+* 1 - ISDN: 16KB/16KB,10ms
+* 2 - 3G,4G: 300/300KB,120ms
+* 3 - satellite modem: 75/64,700ms
+* 4 - ADSL1: 200/8, 80ms
+* 5 - ADSL2: 3000/120, 120ms
+* 16 - ethernet or colo: unlimited/unlimited,1ms
+
+The arrangement makes it very simply to calculate link max speed/latency between two IP numbers just by looking at two "IP" numbers. For now, we can disregard cross-country and cross ISP network speeds and hard-code inter-network latencies to these:
+* between different countries: 200ms
+* between different ISPs of the same country: 30ms
   
 The simulator is working by coordinating many computers using "master" and "starters" roles. Each computer (beside one that runs "master") runs the simulator in "starter" mode that performs the operations below:
 * Connect to "master" and provide number of CPUs available
