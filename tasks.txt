@@ -1,3 +1,16 @@
 Tasks for execution:
 
-Create master/starter framework
+Master/starter framework
+
+Do each step completely before moving on to the next step.
+
+* Write program to start in master mode or in starter (if --starter argument given) mode.
+  - Master might have argument --port, otherwise uses default port 9000
+  - In master mode: Listen on default port, get connections from starters, print information about each new starter connected. You can test it by doing telnet 127.0.0.1 on port 9000
+* starter - add mandatory argument of IP/port of master node in CLI arguments. Use 127.0.0.1 to connect to master that runs on the same machine.
+* starter - get number of available CPUs cores (https://stackoverflow.com/questions/24073697/how-to-find-out-the-number-of-cpus-in-go-lang) send to master
+* master - for each joined starter, print number of CPU cores it has
+* master - keep list of starters connected and number of CPU cores it has
+* master - add flag --cores X, that means number of CPU cores it must await
+* master - once expected number of cores received, send command create world abc from master to each starter
+* starter - receive commands from master and print on screen
