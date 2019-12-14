@@ -77,7 +77,7 @@ Executor handles tracking transmissions delivery timing. For each transmission, 
 * At each epoch do below:
   - For each transmission "in flight" update transmission progress counters, send TPR to the target node
   - Once transmission is complete, it is deleted on the source node, final TPR is sent to the target node
-Receiving excutor performs these actions
+Receiving executor performs these actions:
 * Receive transmission, store data aside (in compressed state), create transmission progress data structure
 * At each epoch do below:
   - For each incoming TPR, update transmission progress counters
