@@ -74,12 +74,14 @@ Transmission is process of transferring data of specified length from one node t
 Similarily, each executor receives transmission data and saves it aside. It then updates transmission progress data structure on each incoming TPR. Once final TPR is received, the transmission data are passed to the node.
 
 Executor handles tracking transmissions delivery timing. For each transmission, sending executor performs these actions:
-* Send transmission to target executor complete transmission data with unique ID.
+* Send transmission to target executor complete transmission data with unique ID. Compress transmission data as it is likely to contain many zeroes.
 * At each epoch do below:
   - For each transmission "in flight" update transmission progress counters, send TPR to the target node
   - Once transmission is complete, it is deleted on the source node, final TPR is sent to the target node
 Receiving excutor performs these actions
-* Receive transmission, store data aside, create transmission progress data structure
+* Receive transmission, store data aside (in compressed state), create transmission progress data structure
 * At each epoch do below:
   - For each incoming TPR, update transmission progress counters
   - Once counters show that transmission have been delivered, pass the data to the node.
+
+The tested code should be aware of running in simulator environment. To minimise data usage, on request to create X GB of content, it is advised to fill only first 256 bytes with pseudorandom data (to get unique hash) and fill rest of it with zeroes. Similarily, it should minimise amount of disk used for storing the data.
