@@ -47,7 +47,7 @@ Each computer (beside one that runs "master") runs the simulator in "starter" mo
 * receive list of other starters and executors
 * Connect to other starters
 * receive instructions on world creation
-* Spawn executor for each available CPU
+* Spawn executor for each CPU on the machine
 * Maintain "routing" of messages between executors, no tracking is done here
 
 Executor - is the workhorse process that runs on single CPU:
