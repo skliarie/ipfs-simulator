@@ -35,7 +35,14 @@ The arrangement makes it very simply to calculate link max speed/latency between
 * between different countries: 200ms
 * between different ISPs of the same country: 30ms
   
-The simulator is working by coordinating many computers using "master" and "starters" roles. Each computer (beside one that runs "master") runs the simulator in "starter" mode that performs the operations below:
+The simulator is working by coordinating many computers using "master" and "starters" roles.
+
+One computer is running master process. As it does not require much CPU, it is expected the same computer will run starter process as well. Master process performs the operations below:
+* Await connections from starters, probably await predefined number of starters
+* Once all starters are "registered", send to each starter list of starters and their tcp/ip details, assign each executor its number, world initiation parameters and awaits completion answer.
+* Coordinate simulation of given microsecond (await all starters to report simulation completion before starting simulation of next ms)
+
+Each computer (beside one that runs "master") runs the simulator in "starter" mode that performs the operations below:
 * Connect to "master" and provide number of CPUs available
 * receive list of other starters and executors
 * Connect to other starters
@@ -43,9 +50,9 @@ The simulator is working by coordinating many computers using "master" and "star
 * Spawn executor for each available CPU
 * Maintain "routing" of messages between executors, no tracking is done here
 
-Once all starters are connected to master, master advertises list of all executors and their tcp/ip details, assigns each executor its number, world initiation parameters and awaits completion answer.
-
-Each executor "creates" nodes it is responsible for using Node API.
+Executor - is the workhorse process that runs on single CPU:
+* it "creates" nodes it is responsible for using Node API.
+* get command from starter node on starting simulation, report completion
 
 2. The Simulation
 
