@@ -11,8 +11,8 @@ Do each step completely before moving on to the next step.
 * starter - get number of available CPUs cores (https://stackoverflow.com/questions/24073697/how-to-find-out-the-number-of-cpus-in-go-lang) send to master
 * master - for each joined starter, print number of CPU cores it has
 * master - keep list of starters connected and number of CPU cores it has
-* master - add flag --executors X, that means number of executors it must await
-* master - once expected number of executors received, send command create world abc from master to each starter
+* master - add flag --starters X, that means number of starters it must await
+* master - once expected number of starters received, send command create world abc from master to each starter
 * starter - receive commands from master and print on screen
 * starter - if connection to master got lost, reset state, try to connect to master every second
 * master - read initial parameters config file in yaml format, convert to json, pass to starters as part of "CREATE WORLD" command
