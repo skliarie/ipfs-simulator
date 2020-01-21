@@ -37,6 +37,8 @@ The arrangement makes it very simply to calculate link max speed/latency between
   
 The simulator is working by coordinating many computers using "master" and "starters" roles.
 
+TBD: what is chunk, function to create nodes in chunk
+
 One computer is running master process. As it does not require much CPU, it is expected the same computer will run starter process as well. Master process performs the operations below:
 * Await connections from starters, probably await predefined number of starters
 * Once all starters are "registered", send to each starter list of starters and their tcp/ip details, assign each executor its number, world initiation parameters and awaits completion answer.
@@ -44,23 +46,26 @@ One computer is running master process. As it does not require much CPU, it is e
 
 Each computer (beside one that runs "master") runs the simulator in "starter" mode that performs the operations below:
 * Connect to "master" and provide number of CPUs available
-* receive list of other starters and executors
+* receive list of other starters and executors TBD: receives list of chunks executors on this node are responsible for
 * Connect to other starters
-* receive instructions on world creation
+* receive instructions on world creation TBD: it is part of chunks distribution function
 * Spawn executor for each CPU on the machine
-* Maintain "routing" of messages between executors, no tracking is done here
+* Maintain "routing" of messages between executors, no tracking is done here TBD: use chunks function to create the routing table
 
 Executor - is the workhorse process that runs on single CPU:
-* it "creates" nodes it is responsible for using Node API.
+* it "creates" nodes it is responsible for using Node API. TBD: using the chunking function
 * get command from starter node on starting simulation, report completion
 
 2. The Simulation
 
-Simulation granularity is 1 millisecond. Once all executors reported readiness, the simulation might start. Simulated milliseconds are called Epoch, starting from 0. Master acts as synchronization point, issuing command to start sumulation for given epoch and awaiting completion signals from each executor.
+Simulation granularity is 1 millisecond. Once all executors reported readiness, the simulation might start. Simulated milliseconds are called Epoch, starting from 0. Master acts as synchronization point, issuing command to start sumulation for given epoch and awaiting completion signals from each starter (that receives completion signals from its executors).
 
 Master uses simulation scenario file to issue "tasks" to executors. The scenario language allows operators like these:
-* Start A nodes of link type B as bootstrapping nodes
-* Seed A nodes of link type B with C GB of content that is of interest by D nodes
+* Start A nodes of link type B as bootstrapping nodes TBD: what is going to happen here?
+* start A nodes of link type B with list of IPs of the bootstrap nodes
+* Populate A nodes of link type B with C GB of content, give me hash of the content TBD: what is going to happen, especially regarding content hash
+* Make A nodes of link type B to be interested in content with hash D
+* TBD: Get indication on p2p network performance regarding previous commands
 
 The "pseudo random" selection of nodes in scenario uses same random seed as during world creation, thus allowing replayability of world/scenarios and getting same results.
 
